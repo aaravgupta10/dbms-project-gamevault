@@ -1,0 +1,361 @@
+{
+  "info": {
+    "name": "GameVault API",
+    "description": "Esports Tournament & Team Management System - endpoints for all 10 MongoDB features.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "playerId", "value": "" },
+    { "key": "teamId", "value": "" },
+    { "key": "team2Id", "value": "" },
+    { "key": "tournamentId", "value": "" },
+    { "key": "matchId", "value": "" },
+    { "key": "inviteId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Players",
+      "item": [
+        {
+          "name": "Create Player",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"skyline\",\n  \"email\": \"skyline@gamevault.gg\",\n  \"role\": \"Duelist\",\n  \"country\": \"US\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/players", "host": ["{{baseUrl}}"], "path": ["players"] }
+          }
+        },
+        {
+          "name": "Get Players (paginated + sorted)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/players?page=1&limit=10&sort=username",
+              "host": ["{{baseUrl}}"],
+              "path": ["players"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "username" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Player by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/players/{{playerId}}", "host": ["{{baseUrl}}"], "path": ["players", "{{playerId}}"] }
+          }
+        },
+        {
+          "name": "Update Player",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"IGL\"\n}" },
+            "url": { "raw": "{{baseUrl}}/players/{{playerId}}", "host": ["{{baseUrl}}"], "path": ["players", "{{playerId}}"] }
+          }
+        },
+        {
+          "name": "Delete Player",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/players/{{playerId}}", "host": ["{{baseUrl}}"], "path": ["players", "{{playerId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nova Phoenix\",\n  \"tag\": \"NOVA\",\n  \"game\": \"Valorant\",\n  \"region\": \"NA\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/teams", "host": ["{{baseUrl}}"], "path": ["teams"] }
+          }
+        },
+        {
+          "name": "Get Teams (paginated + filtered)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/teams?game=Valorant&sort=-stats.points",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams"],
+              "query": [
+                { "key": "game", "value": "Valorant" },
+                { "key": "sort", "value": "-stats.points" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Team by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/teams/{{teamId}}", "host": ["{{baseUrl}}"], "path": ["teams", "{{teamId}}"] }
+          }
+        },
+        {
+          "name": "Update Team",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stats\": { \"wins\": 13, \"losses\": 3, \"points\": 260 }\n}" },
+            "url": { "raw": "{{baseUrl}}/teams/{{teamId}}", "host": ["{{baseUrl}}"], "path": ["teams", "{{teamId}}"] }
+          }
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/teams/{{teamId}}", "host": ["{{baseUrl}}"], "path": ["teams", "{{teamId}}"] }
+          }
+        },
+        {
+          "name": "Transfer Player (ACID Transaction)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"{{playerId}}\",\n  \"toTeamId\": \"{{team2Id}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/teams/transfer", "host": ["{{baseUrl}}"], "path": ["teams", "transfer"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "Create Tournament",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GameVault LAN Invitational\",\n  \"game\": \"Dota 2\",\n  \"description\": \"An in-person invitational.\",\n  \"rules\": \"Single elimination, best of one until finals.\",\n  \"startDate\": \"2026-12-01T10:00:00.000Z\",\n  \"isLAN\": true,\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [-122.4194, 37.7749],\n    \"address\": \"San Francisco, CA\"\n  }\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/tournaments", "host": ["{{baseUrl}}"], "path": ["tournaments"] }
+          }
+        },
+        {
+          "name": "Get Tournaments (paginated + filtered)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tournaments?status=Upcoming&sort=startDate",
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments"],
+              "query": [
+                { "key": "status", "value": "Upcoming" },
+                { "key": "sort", "value": "startDate" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tournament by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tournaments/{{tournamentId}}", "host": ["{{baseUrl}}"], "path": ["tournaments", "{{tournamentId}}"] }
+          }
+        },
+        {
+          "name": "Update Tournament",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Ongoing\"\n}" },
+            "url": { "raw": "{{baseUrl}}/tournaments/{{tournamentId}}", "host": ["{{baseUrl}}"], "path": ["tournaments", "{{tournamentId}}"] }
+          }
+        },
+        {
+          "name": "Delete Tournament",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/tournaments/{{tournamentId}}", "host": ["{{baseUrl}}"], "path": ["tournaments", "{{tournamentId}}"] }
+          }
+        },
+        {
+          "name": "Text Search Tournaments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/search?q=invitational",
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "search"],
+              "query": [{ "key": "q", "value": "invitational" }]
+            }
+          }
+        },
+        {
+          "name": "Nearby LAN Tournaments (Geospatial)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/nearby?lng=-122.42&lat=37.77&maxDistance=100000",
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "nearby"],
+              "query": [
+                { "key": "lng", "value": "-122.42" },
+                { "key": "lat", "value": "37.77" },
+                { "key": "maxDistance", "value": "100000" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "Create Match",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournament\": \"{{tournamentId}}\",\n  \"game\": \"Valorant\",\n  \"teamA\": \"{{teamId}}\",\n  \"teamB\": \"{{team2Id}}\",\n  \"scheduledAt\": \"2026-12-05T18:00:00.000Z\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/matches", "host": ["{{baseUrl}}"], "path": ["matches"] }
+          }
+        },
+        {
+          "name": "Get Matches (paginated + filtered)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/matches?tournament={{tournamentId}}&status=Scheduled",
+              "host": ["{{baseUrl}}"],
+              "path": ["matches"],
+              "query": [
+                { "key": "tournament", "value": "{{tournamentId}}" },
+                { "key": "status", "value": "Scheduled" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Match by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches", "{{matchId}}"] }
+          }
+        },
+        {
+          "name": "Update Match",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"round\": \"Grand Final\"\n}" },
+            "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches", "{{matchId}}"] }
+          }
+        },
+        {
+          "name": "Update Live Score (triggers Change Stream)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"scoreA\": 1,\n  \"scoreB\": 0,\n  \"status\": \"Live\"\n}" },
+            "url": { "raw": "{{baseUrl}}/matches/{{matchId}}/score", "host": ["{{baseUrl}}"], "path": ["matches", "{{matchId}}", "score"] }
+          }
+        },
+        {
+          "name": "Delete Match",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches", "{{matchId}}"] }
+          }
+        },
+        {
+          "name": "Live Match Stream (SSE / Change Streams)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/matches/live/stream", "host": ["{{baseUrl}}"], "path": ["matches", "live", "stream"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invites (TTL)",
+      "item": [
+        {
+          "name": "Create Invite",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromTeam\": \"{{teamId}}\",\n  \"toTeam\": \"{{team2Id}}\",\n  \"message\": \"Want to scrim before the qualifier?\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/invites", "host": ["{{baseUrl}}"], "path": ["invites"] }
+          }
+        },
+        {
+          "name": "Get Invites",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/invites?status=Pending", "host": ["{{baseUrl}}"], "path": ["invites"], "query": [{ "key": "status", "value": "Pending" }] }
+          }
+        },
+        {
+          "name": "Get Invite by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/invites/{{inviteId}}", "host": ["{{baseUrl}}"], "path": ["invites", "{{inviteId}}"] }
+          }
+        },
+        {
+          "name": "Respond to Invite",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Accepted\"\n}" },
+            "url": { "raw": "{{baseUrl}}/invites/{{inviteId}}", "host": ["{{baseUrl}}"], "path": ["invites", "{{inviteId}}"] }
+          }
+        },
+        {
+          "name": "Delete Invite",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/invites/{{inviteId}}", "host": ["{{baseUrl}}"], "path": ["invites", "{{inviteId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stats (Aggregation Pipeline)",
+      "item": [
+        {
+          "name": "Team Rankings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/stats/rankings?game=Valorant", "host": ["{{baseUrl}}"], "path": ["stats", "rankings"], "query": [{ "key": "game", "value": "Valorant" }] }
+          }
+        },
+        {
+          "name": "Games Breakdown",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/stats/games-breakdown", "host": ["{{baseUrl}}"], "path": ["stats", "games-breakdown"] }
+          }
+        }
+      ]
+    }
+  ]
+}

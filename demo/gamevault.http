@@ -1,0 +1,160 @@
+### GameVault API — Demo Requests
+### Requires the "REST Client" extension in VS Code (search "REST Client" by
+### Huachao Mao in the Extensions panel, install, reload if asked).
+### Usage: click the "Send Request" link that appears above each ### block.
+### Make sure `npm run dev` is running first.
+
+@baseUrl = http://localhost:5000/api
+
+### =========================================================
+### 1. CRUD Operations — Players
+### =========================================================
+
+### Create a player
+POST {{baseUrl}}/players
+Content-Type: application/json
+
+{
+  "username": "demoPlayer",
+  "email": "demoplayer@gamevault.gg",
+  "role": "Duelist",
+  "country": "US"
+}
+
+### List players (also demonstrates #5 Pagination and Sorting)
+GET {{baseUrl}}/players?page=1&limit=10&sort=username
+
+### Get a single player by ID (replace with a real _id from the list above)
+GET {{baseUrl}}/players/6aae2a3c29fcbeb2aeab1d9b
+
+### Update a player
+PUT {{baseUrl}}/players/6aae2a3c29fcbeb2aeab1d9b
+Content-Type: application/json
+
+{
+  "role": "IGL"
+}
+
+### Delete a player
+DELETE {{baseUrl}}/players/PASTE_PLAYER_ID_HERE
+
+
+### =========================================================
+### 2. Relational Linking — Teams (roster is an array of Player refs)
+### =========================================================
+
+### List teams — note each team's "players" array is populated with real
+### player documents (username, role), not just raw ObjectIds
+GET {{baseUrl}}/teams
+
+### Get a single team, roster + captain populated
+GET {{baseUrl}}/teams/6aae2a3c29fcbeb2aeab1d98
+
+
+### =========================================================
+### 3. Aggregation Pipeline — Stats
+### =========================================================
+
+### Team rankings: win rate + roster size computed in the database via $lookup
+GET {{baseUrl}}/stats/rankings
+
+### Same, filtered to one game
+GET {{baseUrl}}/stats/rankings?game=Valorant
+
+### Match volume/outcomes grouped by game
+GET {{baseUrl}}/stats/games-breakdown
+
+
+### =========================================================
+### 4. Indexing — no dedicated endpoint; show this in MongoDB Atlas/Compass
+### instead: MongoDB Atlas > Clusters > Browse collections > click arrow next to gamevault > tournaments > Indexes tab, point out the
+### `location_2dsphere` and text indexes, and `teams`/`players` schema files
+### in the code (src/models/*.js) showing schema.index(...) calls.
+### =========================================================
+
+
+### =========================================================
+### 5. Pagination & Sorting - Every list endpoint takes page, limit, sort — response includes total and pages so a frontend can build page controls
+### =========================================================
+
+
+### =========================================================
+### 6. Text Search — Tournaments
+### =========================================================
+
+GET {{baseUrl}}/tournaments/search?q=invitational
+
+
+### =========================================================
+### 7. Multi-Document ACID Transactions — Roster Transfer
+### =========================================================
+
+### Moves a player from their current team (if any) onto a new team.
+### Both the Player document and both Team documents are updated together,
+### inside a single MongoDB transaction (session.withTransaction in
+### src/controllers/teamController.js).
+POST {{baseUrl}}/teams/transfer
+Content-Type: application/json
+
+{
+  "playerId": "PASTE_PLAYER_ID_HERE",
+  "toTeamId": "PASTE_DESTINATION_TEAM_ID_HERE"
+}
+
+
+### =========================================================
+### 8. TTL Index — Match Invites (auto-delete after 24h)
+### =========================================================
+
+### Create an invite — point out the `createdAt` TTL index in
+### src/models/MatchInvite.js (expires: 86400). In a real demo you can't wait
+### 24h, so just show the document exists now, then show the schema code.
+POST {{baseUrl}}/invites
+Content-Type: application/json
+
+{
+  "fromTeam": "PASTE_TEAM_ID_HERE",
+  "toTeam": "PASTE_TEAM2_ID_HERE",
+  "message": "Scrim before the qualifier?"
+}
+
+### List invites
+GET {{baseUrl}}/invites
+
+
+### =========================================================
+### 9. Geospatial Queries — Nearby LAN Tournaments
+### =========================================================
+
+GET {{baseUrl}}/tournaments/nearby?lng=-122.42&lat=37.77&maxDistance=100000
+
+
+### =========================================================
+### 10. Change Streams — Live Match Score
+### =========================================================
+### DO NOT use REST Client's "Send Request" for the stream itself — it's not
+### built for long-lived streaming responses. Instead:
+###
+### 1. Split the VS Code terminal (icon at top-right of the terminal panel)
+###    to open a SECOND terminal next to the one running `npm run dev`.
+### 2. In that new terminal, run:
+###      curl.exe -N http://localhost:5000/api/matches/live/stream
+###    It prints ": connected" and then waits — that's correct.
+### 3. First get a real match ID with the GET request below (Send Request),
+###    copy its "_id", paste it into the PATCH request's URL below.
+### 4. Click "Send Request" on the PATCH request.
+### 5. Look back at the terminal from step 2 — a new JSON line should appear
+###    immediately, showing the change event live.
+
+### Get a real match ID first
+GET {{baseUrl}}/matches
+
+### Trigger the score update (this is what the curl terminal will observe)
+PATCH {{baseUrl}}/matches/PASTE_MATCH_ID_HERE/score
+Content-Type: application/json
+
+{
+  "scoreA": 2,
+  "scoreB": 1,
+  "status": "Live"
+}
