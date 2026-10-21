@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GameVault — Comprehensive DBMS Project Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    @page {
+      size: A4;
+      margin: 14mm 14mm 16mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 9.5pt;
+    }
+
+    /* Cover / Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+      color: #ffffff;
+      padding: 24px 26px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .header-tag {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .header-title {
+      font-size: 23pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+
+    .header-subtitle {
+      font-size: 11pt;
+      color: #cbd5e1;
+      font-weight: 400;
+      margin-bottom: 12px;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 8pt;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 10px;
+    }
+
+    .header-meta span strong {
+      color: #f8fafc;
+    }
+
+    /* Section Styles */
+    .section-title {
+      font-size: 13.5pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-left: 4px solid #2563eb;
+      padding-left: 10px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+      text-align: justify;
+    }
+
+    /* Summary Table */
+    table.summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 18px 0;
+      font-size: 8.5pt;
+    }
+
+    table.summary-table th {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    table.summary-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    table.summary-table tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    .badge-cat {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-core { background: #e0f2fe; color: #0369a1; }
+    .badge-analytics { background: #f3e8ff; color: #6b21a8; }
+    .badge-perf { background: #dcfce7; color: #15803d; }
+    .badge-integrity { background: #fee2e2; color: #b91c1c; }
+    .badge-realtime { background: #fef3c7; color: #b45309; }
+    .badge-storage { background: #ede9fe; color: #5b21b6; }
+
+    /* Feature Cards */
+    .feature-card {
+      page-break-inside: avoid;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .feature-card-header {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 7px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .feature-num-title {
+      font-size: 10pt;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .feature-pill {
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 7.5pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .feature-body {
+      padding: 10px 12px;
+    }
+
+    .feature-subhead {
+      font-size: 7.8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+
+    .subhead-analogy { color: #0284c7; }
+    .subhead-dbms { color: #7c3aed; }
+    .subhead-viva { color: #059669; }
+
+    .feature-text {
+      font-size: 8.6pt;
+      color: #334155;
+      margin-bottom: 7px;
+      line-height: 1.42;
+      text-align: justify;
+    }
+
+    .code-meta-box {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-size: 8pt;
+      margin-top: 5px;
+    }
+
+    .code-meta-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 3px;
+    }
+
+    .code-meta-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .code-meta-label {
+      font-weight: 700;
+      color: #475569;
+      min-width: 100px;
+    }
+
+    .code-meta-value {
+      font-family: 'JetBrains Mono', monospace;
+      color: #0f172a;
+      word-break: break-all;
+    }
+
+    .endpoint-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #1d4ed8;
+      background: #dbeafe;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .viva-box {
+      background: #ecfdf5;
+      border-left: 3px solid #10b981;
+      padding: 5px 8px;
+      font-size: 8pt;
+      color: #065f46;
+      border-radius: 0 4px 4px 0;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* Q&A Section */
+    .qa-card {
+      page-break-inside: avoid;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 9px 11px;
+      margin-bottom: 9px;
+    }
+
+    .qa-question {
+      font-size: 8.8pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .qa-answer {
+      font-size: 8.4pt;
+      color: #334155;
+      line-height: 1.42;
+      text-align: justify;
+    }
+
+    /* Team Details Box */
+    .team-box-container {
+      page-break-inside: avoid;
+      margin-top: 24px;
+      border: 2px solid #2563eb;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+
+    .team-box-title {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+      text-transform: capitalize;
+    }
+
+    .team-box-members {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #1e293b;
+      letter-spacing: 0.2px;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 7.5pt;
+      color: #94a3b8;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER / TITLE BANNER -->
+  <div class="header-banner">
+    <div class="header-tag">DBMS Course Project • Version 3.0 Production</div>
+    <h1 class="header-title">GameVault</h1>
+    <div class="header-subtitle">Esports Tournament & Team Management System</div>
+    <div class="header-meta">
+      <span><strong>Architecture:</strong> Node.js • Express.js • MongoDB Atlas (Replica Set) • Mongoose ODM</span>
+      <span><strong>Database Features:</strong> 20 Distinct MongoDB Functionalities</span>
+      <span><strong>Scope:</strong> Backend REST API & High-Throughput Analytics</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: ABSTRACT -->
+  <div class="section-title">1. Project Abstract & Architectural Overview</div>
+  <p>
+    <strong>GameVault</strong> is an enterprise-grade backend REST API engineered to organize, orchestrate, and analyze a competitive esports ecosystem. Competitive gaming leagues manage intricate, fast-moving datasets spanning professional players, sponsored multi-game teams, multi-tier tournament brackets, live round scoring, anti-cheat audit trails, and legally binding player contracts.
+  </p>
+  <p>
+    While traditional relational database management systems (RDBMS) suffer from rigid table schemas and severe performance penalties when resolving deeply nested 5-table JOINs for live esports data, GameVault leverages <strong>MongoDB</strong>. MongoDB's flexible BSON document model allows intuitive, document-oriented representations of players, rosters, and match progressions while natively supporting multi-document ACID transactions, geospatial indexing, full-text searches, and change streams.
+  </p>
+  <p>
+    GameVault Version 3.0 explicitly implements and demonstrates <strong>20 distinct MongoDB and DBMS functionalities</strong>. Each capability is isolated into a dedicated controller, model, and route, and is verified against a live MongoDB Atlas replica set cluster.
+  </p>
+
+  <!-- SECTION 2: 20-FEATURE SUMMARY TABLE -->
+  <div class="section-title">2. Master Feature Map (All 20 Database Functionalities)</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width: 5%;">#</th>
+        <th style="width: 25%;">Feature Name</th>
+        <th style="width: 18%;">Category</th>
+        <th style="width: 25%;">Database Engine Concept</th>
+        <th style="width: 27%;">Live Verified Endpoint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td><strong>CRUD Operations</strong></td><td><span class="badge-cat badge-core">Core Data</span></td><td>Document creation, reading, updates & deletes</td><td><code>POST/GET /api/players</code></td></tr>
+      <tr><td>2</td><td><strong>Relational Linking</strong></td><td><span class="badge-cat badge-core">Relational</span></td><td>ObjectId references & Mongoose <code>.populate()</code></td><td><code>GET /api/teams</code></td></tr>
+      <tr><td>3</td><td><strong>Aggregation Pipeline</strong></td><td><span class="badge-cat badge-analytics">Analytics</span></td><td><code>$lookup</code>, <code>$addFields</code>, <code>$cond</code>, <code>$group</code></td><td><code>GET /api/stats/rankings</code></td></tr>
+      <tr><td>4</td><td><strong>Advanced Indexing</strong></td><td><span class="badge-cat badge-perf">Optimization</span></td><td>Compound, unique & single-field B-tree indexes</td><td>Atlas Collections > Indexes</td></tr>
+      <tr><td>5</td><td><strong>Pagination & Sorting</strong></td><td><span class="badge-cat badge-perf">Optimization</span></td><td>Cursor skip/limit controls with total pages</td><td><code>GET /api/players?page=1&limit=10</code></td></tr>
+      <tr><td>6</td><td><strong>Full-Text Search</strong></td><td><span class="badge-cat badge-core">Search</span></td><td>Compound text index with <code>textScore</code> relevance</td><td><code>GET /api/tournaments/search?q=</code></td></tr>
+      <tr><td>7</td><td><strong>Multi-Doc ACID Transactions</strong></td><td><span class="badge-cat badge-integrity">Integrity</span></td><td><code>session.withTransaction()</code> two-phase commit</td><td><code>POST /api/teams/transfer</code></td></tr>
+      <tr><td>8</td><td><strong>TTL Auto-Expiration</strong></td><td><span class="badge-cat badge-perf">Lifecycle</span></td><td>Time-To-Live index on <code>createdAt</code> (86400s)</td><td><code>POST /api/invites</code></td></tr>
+      <tr><td>9</td><td><strong>Geospatial Queries</strong></td><td><span class="badge-cat badge-core">Location</span></td><td>GeoJSON Point & <code>2dsphere</code> index with <code>$near</code></td><td><code>GET /api/tournaments/nearby</code></td></tr>
+      <tr><td>10</td><td><strong>Real-Time Change Streams</strong></td><td><span class="badge-cat badge-realtime">Real-Time</span></td><td>Replica set oplog monitoring via <code>Match.watch()</code></td><td><code>GET /api/matches/live/stream</code></td></tr>
+      <tr><td>11</td><td><strong>Faceted Multi-Analytics</strong></td><td><span class="badge-cat badge-analytics">Analytics</span></td><td><code>$facet</code> parallel pipelines & <code>$bucket</code> ranges</td><td><code>GET /api/stats/tournaments/faceted</code></td></tr>
+      <tr><td>12</td><td><strong>Recursive Graph Traversal</strong></td><td><span class="badge-cat badge-analytics">Hierarchy</span></td><td><code>$graphLookup</code> tournament bracket tree traversal</td><td><code>GET /api/tournaments/:id/bracket-tree</code></td></tr>
+      <tr><td>13</td><td><strong>Capped Event Buffer</strong></td><td><span class="badge-cat badge-realtime">Logging</span></td><td>Circular FIFO buffer with auto-overwriting (1MB)</td><td><code>POST/GET /api/audit/events</code></td></tr>
+      <tr><td>14</td><td><strong>Engine Schema Validation</strong></td><td><span class="badge-cat badge-integrity">Integrity</span></td><td>Native database engine <code>$jsonSchema</code> rules</td><td><code>POST /api/contracts</code> (Code 121)</td></tr>
+      <tr><td>15</td><td><strong>Partial Filter Indexes</strong></td><td><span class="badge-cat badge-perf">Optimization</span></td><td>RAM-optimized index on <code>{ team: null }</code></td><td><code>GET /api/players/free-agents</code></td></tr>
+      <tr><td>16</td><td><strong>Positional Array Updates</strong></td><td><span class="badge-cat badge-integrity">Concurrency</span></td><td>Atomic sub-document mutation with <code>arrayFilters</code></td><td><code>PATCH /api/matches/:id/player-stats</code></td></tr>
+      <tr><td>17</td><td><strong>Soft Delete with Hooks</strong></td><td><span class="badge-cat badge-integrity">Retention</span></td><td>Mongoose <code>pre('find')</code> lifecycle middleware hooks</td><td><code>DELETE /teams/:id/soft</code>, <code>/restore</code></td></tr>
+      <tr><td>18</td><td><strong>Bulk Write Operations</strong></td><td><span class="badge-cat badge-perf">Throughput</span></td><td>High-throughput batch execution via <code>bulkWrite()</code></td><td><code>POST /api/matches/bulk-results</code></td></tr>
+      <tr><td>19</td><td><strong>Linguistic Collation</strong></td><td><span class="badge-cat badge-core">Indexing</span></td><td>Case-insensitive uniqueness with <code>strength: 2</code></td><td><code>GET /api/players/lookup/tag</code></td></tr>
+      <tr><td>20</td><td><strong>GridFS Chunked Storage</strong></td><td><span class="badge-cat badge-storage">Binary Storage</span></td><td>255KB chunked streaming overcoming 16MB limit</td><td><code>POST/GET /api/media</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 3: ALL 20 FUNCTIONALITIES DETAILED -->
+  <div class="section-title">3. Exhaustive Technical Breakdown of All 20 Functionalities</div>
+
+  <!-- FEATURE 1 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 01: CRUD Operations (Create, Read, Update, Delete)</div>
+      <div class="feature-pill">Baseline Data Ops</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        Like managing an inventory or roster in a video game: creating new pro player accounts, reading team leaderboards, updating a player's rank or country, and retiring/deleting inactive player profiles.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Fundamental document-oriented database operations utilizing BSON serialization. Mongoose models map controllers to native MongoDB operations (<code>insertOne</code>, <code>find</code>, <code>findByIdAndUpdate</code>, <code>findByIdAndDelete</code>) with strict schema validation.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Player.js • src/controllers/playerController.js • src/routes/playerRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/players</span> • <span class="endpoint-badge">GET /api/players</span> • <span class="endpoint-badge">PUT /api/players/:id</span> • <span class="endpoint-badge">DELETE /api/players/:id</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "CRUD forms the foundational document lifecycle in MongoDB; all advanced query operators and aggregation pipelines build upon this baseline layer."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 2 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 02: Relational Linking & Dynamic Population</div>
+      <div class="feature-pill">Relational NoSQL</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        Instead of duplicating the full gamer profile inside every team, match, and tournament document, teams simply hold the player's unique gamer ID badge. When viewing a team, MongoDB resolves those badges into full player biographies on the fly.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Normalizes relational data within a document store using <code>ObjectId</code> references (<code>ref: 'Player'</code>). Mongoose's <code>.populate('players', 'username role')</code> performs client-side joins without document duplication, avoiding data divergence while maintaining relational integrity.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Team.js • src/controllers/teamController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/teams</span> • <span class="endpoint-badge">GET /api/teams/:id</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Population is the document database equivalent of a relational SQL JOIN, keeping schemas normalized and preventing stale redundant copies across documents."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 3 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 03: Aggregation Pipeline Analytics</div>
+      <div class="feature-pill">Database Analytics</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        Computing live team win rates, total matches played, and games breakdowns directly inside the database engine, instead of downloading 10,000 matches into JavaScript memory and crunching numbers with a slow for-loop.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Multi-stage aggregation pipeline running in database kernel space: <code>$match</code> filters scope, <code>$addFields</code> calculates totals and divides wins by matches, <code>$cond</code> guards against zero-division, <code>$sort</code> orders by rank, <code>$lookup</code> joins roster documents, and <code>$project</code> shapes output.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/controllers/statsController.js • src/routes/statsRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/stats/rankings</span> • <span class="endpoint-badge">GET /api/stats/games-breakdown</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Aggregation pipelines allow complex multi-stage data transformation to execute natively in the MongoDB database engine with optimized C++ routines."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 4 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 04: Advanced Indexing (Compound & Unique)</div>
+      <div class="feature-pill">Performance Optimization</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        Like an index at the end of a massive gaming encyclopedia: it allows MongoDB to jump straight to the exact team or tournament in 2 milliseconds instead of turning and reading every single page in the book.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        B-tree index data structures maintained by the WiredTiger storage engine. Unique indexes (<code>username</code>, <code>tag</code>) prevent duplicate registration collisions, while compound indexes (<code>{ game: 1, status: 1 }</code>) eliminate full collection scans (COLLSCAN) in favor of index scans (IXSCAN).
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Player.js • src/models/Team.js • src/models/Tournament.js • src/models/Match.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Verification:</span><span class="endpoint-badge">Atlas Collections &gt; tournaments &gt; Indexes tab</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Compound indexes optimize multi-predicate queries (Equality, Sort, Range ESR rule), drastically reducing CPU utilization and query latency."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 5 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 05: Pagination & Deterministic Sorting</div>
+      <div class="feature-pill">Large Dataset Control</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        When browsing a global leaderboard with 100,000 players, you view 10 players per page with page numbers. This prevents the browser from crashing and keeps network payloads tiny and fast.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Cursor manipulation using <code>.skip((page - 1) * limit)</code> and <code>.limit(limit)</code> paired with <code>Promise.all([findQuery, countDocuments])</code>. Returns exact pagination metadata (<code>total</code>, <code>page</code>, <code>pages</code>) so frontend applications can build deterministic controls.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/utils/pagination.js • src/controllers/playerController.js • src/controllers/teamController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/players?page=1&limit=10&sort=username</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Pagination prevents memory exhaustion on both database and client by streaming chunked cursors with calculated page bounds."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 6 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 06: Full-Text Search with Relevance Scoring</div>
+      <div class="feature-pill">Search Engine</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        An intelligent tournament search bar: users type words like "invitational" or "qualifier", and MongoDB scans titles, descriptions, and rulebooks simultaneously, ranking the best matches at the top.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Compound inverted text index on <code>{ name: 'text', description: 'text', rules: 'text' }</code>. MongoDB tokenizes terms, removes language stop-words, stems root words, and calculates a <code>textScore</code> metadata field reflecting term frequency for relevance sorting.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Tournament.js • src/controllers/tournamentController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/tournaments/search?q=invitational</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Full-text indexing provides native search engine capabilities within MongoDB without needing an external Elasticsearch cluster."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 7 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 07: Multi-Document ACID Transactions</div>
+      <div class="feature-pill">Data Consistency</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        An "all-or-nothing" roster transfer safety net: when a pro player moves from Team A to Team B, removing them from Team A, adding them to Team B, and updating the player document must all succeed together. If the server loses power midway, everything rolls back so the player is never lost or duplicated.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Executed via <code>session.withTransaction()</code> over a MongoDB replica set. Coordinates multi-document snapshot isolation and two-phase commit. If any update fails or throws an exception, the session aborts and rolls back all writes atomically.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/controllers/teamController.js (transferPlayer)</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/teams/transfer</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "MongoDB transactions provide strict ACID compliance across multiple documents, eliminating partial state corruption during complex relational transfers."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 8 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 08: Time-To-Live (TTL) Auto-Expiring Documents</div>
+      <div class="feature-pill">Lifecycle Automation</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        A self-destruct timer on scrimmage and match invites: pending invites automatically disappear after 24 hours without requiring any manual deletion or server cron jobs.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Single-field index on <code>createdAt</code> configured with <code>expires: 86400</code> (24 hours in seconds). A specialized MongoDB background thread runs periodically, compares index timestamps with current system clock, and purges expired documents automatically.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/MatchInvite.js • src/controllers/inviteController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/invites</span> • <span class="endpoint-badge">GET /api/invites</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "TTL indexes offload record expiration to the database engine, eliminating external cron scripts and keeping collections lightweight."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 9 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 09: Geospatial Queries (2dsphere & $near)</div>
+      <div class="feature-pill">Location Services</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        An in-person LAN tournament locator: players enter their city GPS coordinates, and GameVault finds all physical esports arenas within a 100km radius, automatically sorted nearest-first.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        GeoJSON Point geometry (<code>{ type: "Point", coordinates: [lng, lat] }</code>) paired with a <code>2dsphere</code> index. Queried using <code>$near</code> with <code>$maxDistance</code>, calculating geodesic distance over an Earth-like sphere in meters and sorting by proximity.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Tournament.js • src/controllers/tournamentController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/tournaments/nearby?lng=-122.42&lat=37.77&maxDistance=100000</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "MongoDB's 2dsphere index calculates true spherical geometry on Earth's surface rather than flat 2D Euclidean projections."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 10 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 10: Real-Time Change Streams & Server-Sent Events</div>
+      <div class="feature-pill">Real-Time Push</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        A live spectator scoreboard: when a referee enters a point for Team A, the update is pushed instantly to every watching client's screen over a live connection without anyone having to hit refresh.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        <code>Match.watch()</code> opens an active tailable cursor against the MongoDB replica set internal operations log (oplog). State changes fire Node.js EventEmitter events that stream JSON updates to clients over Server-Sent Events (SSE).
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/utils/changeStreamWatcher.js • src/controllers/matchController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/matches/live/stream</span> (SSE) • <span class="endpoint-badge">PATCH /api/matches/:id/score</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Change streams monitor the replica set oplog at the database engine level, enabling real-time reactive architectures without poll loops."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 11 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 11: Faceted Search & Multi-Bucket Analytics</div>
+      <div class="feature-pill">Multi-Dimensional Stats</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        The filter sidebar on Steam: clicking one search button returns prize money brackets ($0-$5k, $5k-$25k, $25k+), game breakdowns, and top tournaments calculated simultaneously in one call.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        The <code>$facet</code> aggregation stage processes multiple independent sub-pipelines in parallel over the same document stream in a single query. Integrates <code>$bucket</code> for numerical prize ranges and <code>$sortByCount</code> for categorical distributions.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/controllers/statsController.js • src/routes/statsRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/stats/tournaments/faceted</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Faceted search executes multi-branch aggregation pipelines in a single database round-trip, optimizing e-commerce and dashboard query performance."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 12 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 12: Recursive Graph Traversal ($graphLookup)</div>
+      <div class="feature-pill">Hierarchical Graphs</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        An interactive playoff bracket tree: Quarterfinals feed into Semifinals, which feed into the Grand Final. MongoDB starts at the Championship Final and follows all parent matches backwards to draw the entire tournament tree in one query.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        <code>$graphLookup</code> performs a recursive transitive closure search across documents, linking <code>previousMatchIds</code> to <code>_id</code>. It tracks tree depth using <code>depthField: 'bracketLevel'</code>, allowing hierarchical bracket graph reconstruction without recursive application loops.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Match.js • src/controllers/tournamentController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/tournaments/:id/bracket-tree</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "GraphLookup executes recursive graph traversals directly within MongoDB, natively resolving directed acyclic graphs and tree hierarchies."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 13 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 13: Capped Collections & Circular FIFO Buffer</div>
+      <div class="feature-pill">High-Throughput Ticker</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        A live in-game killfeed ticker: you only care about the latest 500 events (kills, pauses, bomb plants). Old events fall off the conveyor belt automatically as new events arrive, keeping the game smooth and never filling the hard drive.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Fixed-size collection created with <code>{ capped: true, size: 1048576, max: 500 }</code>. Documents are written in strict physical insertion order on disk. Oldest records are automatically overwritten once capacity is reached. Read via <code>$natural: -1</code> for optimal disk scanning.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/MatchEventLog.js • src/controllers/auditController.js • src/routes/auditRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/audit/events</span> • <span class="endpoint-badge">GET /api/audit/events?limit=10</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Capped collections provide circular FIFO buffers allocated with fixed disk space, guaranteeing high insertion speed with zero deletion overhead."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 14 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 14: Engine-Level Schema Validation ($jsonSchema)</div>
+      <div class="feature-pill">Database Guardrails</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        A security guard standing directly at the database vault: pro player contracts must have a salary of at least $500 and a code matching "CTR-####-XX". Even if an admin opens MongoDB Compass directly and tries to bypass the backend, MongoDB itself rejects the bad data.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Database-level JSON Schema validator enforced directly by the WiredTiger engine via collection options (<code>validator: { $jsonSchema: ... }</code>). Rejects violating documents with error code 121 (<code>Document failed validation</code>), independent of application Mongoose code.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/PlayerContract.js • src/controllers/contractController.js • src/routes/contractRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/contracts</span> (valid payload: 201; invalid salary/code: 400 with code 121)</div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Engine-level $jsonSchema validation guarantees data integrity at the database storage layer, protecting data even if application code is bypassed."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 15 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 15: Partial Filter Indexes (partialFilterExpression)</div>
+      <div class="feature-pill">Index Optimization</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        Scouts only ever search for "Free Agents" (players without a team). Indexing all 50,000 rostered players wastes expensive memory, so we only index players who have no team. The index is 90% smaller and writes are much faster.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Index created with <code>{ partialFilterExpression: { team: null } }</code>. Only indexes documents that satisfy the specified filter expression, drastically lowering RAM usage, B-tree index depth, and write amplification during player updates.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Player.js • src/controllers/playerController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/players/free-agents</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Partial filter indexes reduce B-tree index size and write overhead by indexing only the critical subset of documents matching query patterns."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 16 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 16: Positional Array Updates (arrayFilters & $inc)</div>
+      <div class="feature-pill">Atomic Sub-Documents</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        A player scores a kill during a live match: the database reaches straight inside the match's player list and adds +1 to that specific player's kills atomically without having to download and replace the whole match document.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Positional array operator <code>$[elem]</code> combined with <code>arrayFilters: [{ 'p.player': playerId }]</code> and <code>$inc</code>. Modifies specific embedded array sub-documents in-place atomically, preventing read-modify-write concurrency race conditions.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Match.js • src/controllers/matchController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">PATCH /api/matches/:id/player-stats</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "ArrayFilters allow fine-grained atomic updates inside nested BSON arrays without full document replacement or race conditions."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 17 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 17: Soft Delete with Mongoose Lifecycle Hooks</div>
+      <div class="feature-pill">Data Retention & Integrity</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        A recycle bin for disbanded teams: marking a team as deleted preserves all its past tournament victories and matches in history, while the database automatically hides it from normal search results.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Mongoose <code>pre(/^find/)</code> and <code>pre('countDocuments')</code> lifecycle query middleware hooks intercept read queries and prepend <code>{ isDeleted: { $ne: true } }</code>, transparently excluding soft-deleted records unless an admin passes <code>includeDeleted: true</code>.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Team.js • src/controllers/teamController.js • src/routes/teamRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">DELETE /api/teams/:id/soft</span> • <span class="endpoint-badge">PATCH /api/teams/:id/restore</span> • <span class="endpoint-badge">GET /api/teams?includeDeleted=true</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Query lifecycle middleware transparently enforces soft deletion across application queries, protecting historical relational integrity."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 18 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 18: High-Throughput Bulk Write Operations</div>
+      <div class="feature-pill">Batch Throughput</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        Submitting 20 match scores at the end of a tournament day in one single package instead of making 20 slow, back-and-forth roundtrips over the internet.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        <code>Model.bulkWrite()</code> bundles multiple operations (<code>updateOne</code>, <code>insertOne</code>, <code>deleteMany</code>) into a single batch network packet. Minimizes TCP roundtrips, reduces socket overhead, and optimizes storage engine lock contention.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/controllers/matchController.js (bulkUpdateMatches)</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/matches/bulk-results</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "BulkWrite consolidates multiple distinct write operations into a single network packet, maximizing database ingestion throughput."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 19 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 19: Linguistic Collation (Case-Insensitive Indexing)</div>
+      <div class="feature-pill">String Indexing</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        In gaming, usernames like "v1per", "V1PER", and "V1per" belong to the same person. The database understands letter-case rules so duplicate accounts are prevented and lookups are fast without regex.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        Index collation configured with <code>{ locale: 'en', strength: 2 }</code>. Level 2 strength ignores case variations during string comparison and sorting, enforcing unique gamerTag constraints at the index level without expensive regular expression table scans.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/models/Player.js • src/controllers/playerController.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">GET /api/players/lookup/tag?handle=V1PER</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "Collation applies linguistic comparison rules directly inside B-tree indexes, guaranteeing case-insensitive uniqueness without table scans."</div>
+    </div>
+  </div>
+
+  <!-- FEATURE 20 -->
+  <div class="feature-card">
+    <div class="feature-card-header">
+      <div class="feature-num-title">FEATURE 20: GridFS Chunked Binary Media Storage</div>
+      <div class="feature-pill">Large File Storage</div>
+    </div>
+    <div class="feature-body">
+      <div class="feature-subhead subhead-analogy">Simple Explanation & Gaming Analogy</div>
+      <div class="feature-text">
+        MongoDB documents normally have a 16MB limit. But official tournament PDF rulebooks and game replay demo files can be 50MB+. GridFS splits large binary files into small 255KB pieces to store and stream them smoothly.
+      </div>
+      <div class="feature-subhead subhead-dbms">DBMS & MongoDB Engine Principle</div>
+      <div class="feature-text">
+        MongoDB GridFS specification implemented via <code>GridFSBucket</code>. Automatically partitions binary streams into 255KB chunks stored in <code>media.chunks</code> and metadata in <code>media.files</code>, streaming data back to clients with proper MIME type headers.
+      </div>
+      <div class="code-meta-box">
+        <div class="code-meta-row"><span class="code-meta-label">Code Files:</span><span class="code-meta-value">src/controllers/mediaController.js • src/routes/mediaRoutes.js</span></div>
+        <div class="code-meta-row"><span class="code-meta-label">Endpoints:</span><span class="endpoint-badge">POST /api/media/upload</span> • <span class="endpoint-badge">GET /api/media</span> • <span class="endpoint-badge">GET /api/media/:id/stream</span></div>
+      </div>
+      <div class="viva-box"><strong>Viva Talking Point:</strong> "GridFS overcomes the 16MB BSON document limit by chunking binary media directly inside MongoDB with replica-set backup synchronization."</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: VIVA DEFENSE QUESTIONS -->
+  <div class="section-title">4. Key Academic Viva & Defense Questions</div>
+
+  <div class="qa-card">
+    <div class="qa-question">Q1: Why choose MongoDB over a Relational Database (SQL) for GameVault?</div>
+    <div class="qa-answer">
+      Esports data is inherently hierarchical and dynamic (nested team rosters, multi-tier tournament brackets, real-time match telemetry). In SQL, querying a tournament with its participating teams, player rosters, and live matches requires complex 5-table JOIN operations that introduce substantial lock contention. MongoDB stores documents in naturally aligned structures while still supporting multi-document ACID transactions (Feature 7) where relational integrity is critical.
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">Q2: What is the exact difference between Mongoose Validation and MongoDB $jsonSchema?</div>
+    <div class="qa-answer">
+      Mongoose validation runs strictly in the Node.js application process memory before data is transmitted. If an administrator connects via MongoDB Compass, Python, or shell, Mongoose validation is completely bypassed. In contrast, Feature 14 enforces <code>$jsonSchema</code> directly inside the MongoDB database storage engine, rejecting invalid writes with error code 121 regardless of the client used.
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">Q3: Why use a Capped Collection for Match Events instead of a TTL Index?</div>
+    <div class="qa-answer">
+      TTL indexes delete records based on elapsed duration (e.g., after 24 hours). Capped Collections (Feature 13) enforce strict physical size (1MB) and document count (500) boundaries. When record #501 arrives, record #1 is overwritten immediately on disk like a circular buffer with zero background delete overhead, guaranteeing fixed disk allocation for high-throughput live event tickers.
+    </div>
+  </div>
+
+  <div class="qa-card">
+    <div class="qa-question">Q4: How do Change Streams function internally?</div>
+    <div class="qa-answer">
+      Change Streams (Feature 10) require a MongoDB Replica Set. Every state modification is recorded into the internal replication operations log (<code>oplog.rs</code>). <code>Match.watch()</code> opens an active tailable cursor against this oplog, emitting instant change events that are streamed over Server-Sent Events (SSE) without client polling.
+    </div>
+  </div>
+
+  <!-- SECTION 5: TEAM DETAILS (AS IN SCREENSHOT) -->
+  <div class="team-box-container">
+    <div class="team-box-title">Team Details</div>
+    <div class="team-box-members">
+      Nikit Pandey(24BKT0165) , Aarav Gupta (24BCE0725) , Raunak Raja (24BCE0057)
+    </div>
+  </div>
+
+  <div class="footer-note">
+    GameVault — Esports Tournament & Team Management System • Database Management System (DBMS) Project
+  </div>
+
+</body>
+</html>
