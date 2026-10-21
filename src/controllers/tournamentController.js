@@ -1,6 +1,8 @@
 const Tournament = require('../models/Tournament');
+const Match = require('../models/Match');
 const asyncHandler = require('../middleware/asyncHandler');
 const ApiError = require('../utils/ApiError');
+
 const paginate = require('../utils/pagination');
 
 // @desc  Create a tournament
@@ -91,3 +93,80 @@ exports.getNearbyTournaments = asyncHandler(async (req, res) => {
 
   res.json({ success: true, count: tournaments.length, data: tournaments });
 });
+
+// @desc  Traverse tournament bracket tree from finals back to qualifiers
+// (12) Recursive Graph Traversal ($graphLookup) — navigates hierarchical bracket
+// matches starting from the Final match and recursively following previousMatchIds.
+exports.getTournamentBracketTree = asyncHandler(async (req, res) => {
+  const tournamentId = req.params.id;
+  const tournament = await Tournament.findById(tournamentId);
+  if (!tournament) throw new ApiError(404, 'Tournament not found');
+
+  const tree = await Match.aggregate([
+    {
+      $match: {
+        tournament: tournament._id,
+        round: 'Final',
+      },
+    },
+    {
+      $graphLookup: {
+        from: 'matches',
+        startWith: '$previousMatchIds',
+        connectFromField: 'previousMatchIds',
+        connectToField: '_id',
+        as: 'bracketProgression',
+        depthField: 'bracketLevel',
+      },
+    },
+    {
+      $lookup: {
+        from: 'teams',
+        localField: 'teamA',
+        foreignField: '_id',
+        as: 'teamAInfo',
+      },
+    },
+    {
+      $lookup: {
+        from: 'teams',
+        localField: 'teamB',
+        foreignField: '_id',
+        as: 'teamBInfo',
+      },
+    },
+    {
+      $project: {
+        round: 1,
+        game: 1,
+        status: 1,
+        scoreA: 1,
+        scoreB: 1,
+        teamA: { $arrayElemAt: ['$teamAInfo.name', 0] },
+        teamB: { $arrayElemAt: ['$teamBInfo.name', 0] },
+        bracketProgression: {
+          $map: {
+            input: '$bracketProgression',
+            as: 'm',
+            in: {
+              matchId: '$$m._id',
+              round: '$$m.round',
+              bracketLevel: '$$m.bracketLevel',
+              scoreA: '$$m.scoreA',
+              scoreB: '$$m.scoreB',
+              status: '$$m.status',
+            },
+          },
+        },
+      },
+    },
+  ]);
+
+  res.json({
+    success: true,
+    description: 'Hierarchical tournament bracket tree via $graphLookup recursive traversal',
+    tournament: tournament.name,
+    bracketRoot: tree[0] || null,
+  });
+});
+

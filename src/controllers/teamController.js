@@ -19,11 +19,13 @@ exports.getTeams = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.game) filter.game = req.query.game;
   if (req.query.region) filter.region = req.query.region;
+  if (req.query.includeDeleted === 'true') filter.includeDeleted = true;
 
   const [teams, total] = await Promise.all([
     Team.find(filter).populate('players', 'username role').sort(sort).skip(skip).limit(limit),
     Team.countDocuments(filter),
   ]);
+
 
   res.json({
     success: true,
@@ -111,3 +113,36 @@ exports.transferPlayer = asyncHandler(async (req, res) => {
     data: updatedPlayer,
   });
 });
+
+// @desc  Soft delete a team (moves to trash without breaking past match relations)
+// (17) Soft Delete — sets isDeleted: true and deletedAt timestamp
+exports.softDeleteTeam = asyncHandler(async (req, res) => {
+  const team = await Team.findByIdAndUpdate(
+    req.params.id,
+    { isDeleted: true, deletedAt: new Date() },
+    { new: true }
+  );
+  if (!team) throw new ApiError(404, 'Team not found');
+  res.json({
+    success: true,
+    message: 'Team soft-deleted successfully (excluded from normal queries via Mongoose pre hooks)',
+    data: team,
+  });
+});
+
+// @desc  Restore a soft-deleted team
+// (17) Soft Delete — restores team back to active status
+exports.restoreTeam = asyncHandler(async (req, res) => {
+  const team = await Team.findOneAndUpdate(
+    { _id: req.params.id, includeDeleted: true },
+    { isDeleted: false, deletedAt: null },
+    { new: true }
+  );
+  if (!team) throw new ApiError(404, 'Soft-deleted team not found');
+  res.json({
+    success: true,
+    message: 'Team restored successfully',
+    data: team,
+  });
+});
+

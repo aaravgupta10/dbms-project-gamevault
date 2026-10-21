@@ -15,8 +15,8 @@ POST {{baseUrl}}/players
 Content-Type: application/json
 
 {
-  "username": "demoPlayer",
-  "email": "demoplayer@gamevault.gg",
+  "username": "demoPlayer2",
+  "email": "demoplayer@gamevault2.gg",
   "role": "Duelist",
   "country": "US"
 }
@@ -28,7 +28,7 @@ GET {{baseUrl}}/players?page=1&limit=10&sort=username
 GET {{baseUrl}}/players/6aae2a3c29fcbeb2aeab1d9b
 
 ### Update a player
-PUT {{baseUrl}}/players/6aae2a3c29fcbeb2aeab1d9b
+PUT {{baseUrl}}/players/6aae2a3c29fcbeb2aeab1d9a
 Content-Type: application/json
 
 {
@@ -97,8 +97,8 @@ POST {{baseUrl}}/teams/transfer
 Content-Type: application/json
 
 {
-  "playerId": "PASTE_PLAYER_ID_HERE",
-  "toTeamId": "PASTE_DESTINATION_TEAM_ID_HERE"
+  "playerId": "6aae2ac3eae1a2dfeafc926a",
+  "toTeamId": "6aae2a3c29fcbeb2aeab1d96"
 }
 
 
@@ -113,8 +113,8 @@ POST {{baseUrl}}/invites
 Content-Type: application/json
 
 {
-  "fromTeam": "PASTE_TEAM_ID_HERE",
-  "toTeam": "PASTE_TEAM2_ID_HERE",
+  "fromTeam": "6aae2a3c29fcbeb2aeab1d96",
+  "toTeam": "6aae2a3c29fcbeb2aeab1d98",
   "message": "Scrim before the qualifier?"
 }
 
@@ -158,3 +158,181 @@ Content-Type: application/json
   "scoreB": 1,
   "status": "Live"
 }
+
+
+### =========================================================
+### 11. Faceted Search ($facet & $bucket) — Multi-Dimensional Analytics
+### =========================================================
+### Computes 4 parallel analytics pipelines in a single database roundtrip:
+### 1) Prize pool buckets ($0-$5k, $5k-$25k, $25k-$100k) via $bucket
+### 2) Tournament game breakdown via $sortByCount
+### 3) Tournament status distribution
+### 4) Top 3 highest prize tournaments
+GET {{baseUrl}}/stats/tournaments/faceted
+
+
+### =========================================================
+### 12. Recursive Graph Traversal ($graphLookup) — Tournament Bracket Tree
+### =========================================================
+### Traces the entire tournament bracket dependency tree backwards starting
+### from the Championship Final match down to Semifinals and Quarterfinals.
+### First run GET /tournaments, copy the _id of "GameVault Winter Championship"
+GET {{baseUrl}}/tournaments
+
+### Get the complete recursive bracket progression tree
+GET {{baseUrl}}/tournaments/PASTE_TOURNAMENT_ID_HERE/bracket-tree
+
+
+### =========================================================
+### 13. Capped Collection (capped: true) — Circular Match Event Ticker
+### =========================================================
+### Fixed-size collection acting as a high-speed circular FIFO buffer.
+### When full, oldest entries are automatically purged by MongoDB with zero cron jobs.
+
+### Log a real-time event to the capped collection
+POST {{baseUrl}}/audit/events
+Content-Type: application/json
+
+{
+  "eventType": "Kill",
+  "message": "v1per secured an ace (5 kills) on Ascent B-site!",
+  "severity": "Info"
+}
+
+### Read the latest events in natural FIFO insertion order ($natural: -1)
+GET {{baseUrl}}/audit/events?limit=10
+
+
+### =========================================================
+### 14. Engine Schema Validation ($jsonSchema) — Native DB Constraints
+### =========================================================
+### Enforced directly by the MongoDB core storage engine (code 121),
+### rejecting writes that violate business rules even if application code is bypassed.
+
+### Valid contract: succeeds (salary >= 500, regex CTR-####-XX matches)
+### (Get a real player ID and team ID from GET /players and GET /teams)
+POST {{baseUrl}}/contracts
+Content-Type: application/json
+
+{
+  "player": "PASTE_PLAYER_ID_HERE",
+  "team": "PASTE_TEAM_ID_HERE",
+  "contractCode": "CTR-3030-NA",
+  "salary": 2500,
+  "status": "Active"
+}
+
+### Invalid contract test: demonstrates MongoDB engine rejection!
+### (salary is 200 which is < 500 minimum; contract code does not match regex)
+### Observe the database returns validation error code 121!
+POST {{baseUrl}}/contracts
+Content-Type: application/json
+
+{
+  "player": "PASTE_PLAYER_ID_HERE",
+  "team": "PASTE_TEAM_ID_HERE",
+  "contractCode": "INVALID_CODE",
+  "salary": 200,
+  "status": "Active"
+}
+
+### List contracts
+GET {{baseUrl}}/contracts
+
+
+### =========================================================
+### 15. Partial Filter Index (partialFilterExpression) — Free Agents
+### =========================================================
+### Only indexes the small fraction of players where team == null.
+### Drastically saves memory & index writes compared to indexing all players.
+GET {{baseUrl}}/players/free-agents
+
+
+### =========================================================
+### 16. Positional Array Updates (arrayFilters & $inc) — Pinpoint Stat Updates
+### =========================================================
+### Atomically increments a specific player's kills inside the match's
+### playerPerformances array in-place, preventing race conditions.
+### Copy a match _id from GET /matches and a player _id from GET /players
+PATCH {{baseUrl}}/matches/PASTE_MATCH_ID_HERE/player-stats
+Content-Type: application/json
+
+{
+  "playerId": "PASTE_PLAYER_ID_HERE",
+  "killsDelta": 3,
+  "deathsDelta": 1,
+  "assistsDelta": 2
+}
+
+
+### =========================================================
+### 17. Soft Delete & Query Lifecycle Hooks (pre('find'))
+### =========================================================
+### Soft deletes a team by marking isDeleted: true. The Mongoose pre('find')
+### middleware hook automatically hides it from normal queries while preserving
+### historical tournament records. Can be restored anytime.
+
+### 1) Soft-delete a team (copy team ID from GET /teams)
+DELETE {{baseUrl}}/teams/PASTE_TEAM_ID_HERE/soft
+
+### 2) Notice the team has disappeared from the normal list
+GET {{baseUrl}}/teams
+
+### 3) Query with includeDeleted=true (admin view) to see it in the recycle bin
+GET {{baseUrl}}/teams?includeDeleted=true
+
+### 4) Restore the team back to active status
+PATCH {{baseUrl}}/teams/PASTE_TEAM_ID_HERE/restore
+
+
+### =========================================================
+### 18. Bulk Write Operations (bulkWrite) — Batch Match Reporter
+### =========================================================
+### Bundles multiple match score updates into a single database network roundtrip.
+### Copy two real match IDs from GET /matches
+POST {{baseUrl}}/matches/bulk-results
+Content-Type: application/json
+
+{
+  "updates": [
+    {
+      "matchId": "PASTE_FIRST_MATCH_ID_HERE",
+      "scoreA": 3,
+      "scoreB": 1,
+      "status": "Completed"
+    },
+    {
+      "matchId": "PASTE_SECOND_MATCH_ID_HERE",
+      "scoreA": 2,
+      "scoreB": 2,
+      "status": "Completed"
+    }
+  ]
+}
+
+
+### =========================================================
+### 19. Collation (strength: 2) — Case-Insensitive GamerTag Matching
+### =========================================================
+### Matches gamerTag regardless of casing ('v1per', 'V1PER', 'V1per')
+### using index collation { locale: 'en', strength: 2 } without regex scans.
+
+### Search with uppercase
+GET {{baseUrl}}/players/lookup/tag?handle=V1PER
+
+### Search with lowercase (returns the exact same player)
+GET {{baseUrl}}/players/lookup/tag?handle=v1per
+
+
+### =========================================================
+### 20. GridFS Chunked Binary Storage (GridFSBucket) — Rulebooks & Replays
+### =========================================================
+### Slices large files into 255KB chunks stored in media.files and media.chunks.
+
+### List files currently stored in MongoDB GridFS
+GET {{baseUrl}}/media
+
+### Stream the rulebook PDF chunks directly to client
+### (Replace ID with the _id from the list above)
+GET {{baseUrl}}/media/PASTE_MEDIA_ID_HERE/stream
+

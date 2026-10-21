@@ -11,6 +11,17 @@ const matchSchema = new mongoose.Schema(
     scoreA: { type: Number, default: 0, min: 0 },
     scoreB: { type: Number, default: 0, min: 0 },
     winner: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', default: null },
+    // (12) Recursive Graph Traversal ($graphLookup) — links earlier matches in tournament bracket
+    previousMatchIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match' }],
+    // (16) Positional Array Updates — fine-grained player stats updated atomically via arrayFilters
+    playerPerformances: [
+      {
+        player: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' },
+        kills: { type: Number, default: 0, min: 0 },
+        deaths: { type: Number, default: 0, min: 0 },
+        assists: { type: Number, default: 0, min: 0 },
+      },
+    ],
     status: {
       type: String,
       enum: ['Scheduled', 'Live', 'Completed'],
@@ -26,4 +37,12 @@ matchSchema.index({ tournament: 1, scheduledAt: 1 });
 matchSchema.index({ status: 1 });
 matchSchema.index({ game: 1 });
 
+// (15) Partial Filter Index — only indexes matches currently marked 'Live'
+// Used by real-time scoreboard queries to immediately find live matches without scanning past or future ones.
+matchSchema.index(
+  { scheduledAt: 1 },
+  { partialFilterExpression: { status: 'Live' } }
+);
+
 module.exports = mongoose.model('Match', matchSchema);
+

@@ -11,7 +11,7 @@ const matchInviteSchema = new mongoose.Schema({
     default: 'Pending',
   },
   // (8) TTL Index — pending invites are automatically purged 24 hours after creation
-  createdAt: { type: Date, default: Date.now, expires: 60 * 60 * 24 },
+  createdAt: { type: Date, default: Date.now, expires: 10 },
 });
 
 module.exports = mongoose.model('MatchInvite', matchInviteSchema);

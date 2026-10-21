@@ -27,6 +27,8 @@ const playerSchema = new mongoose.Schema(
       default: 'Flex',
     },
     country: { type: String, trim: true },
+    // (19) Collation — case-insensitive gamerTag (e.g. 'v1per' == 'V1PER')
+    gamerTag: { type: String, trim: true },
     stats: {
       matchesPlayed: { type: Number, default: 0, min: 0 },
       kills: { type: Number, default: 0, min: 0 },
@@ -41,4 +43,18 @@ const playerSchema = new mongoose.Schema(
 playerSchema.index({ team: 1 });
 playerSchema.index({ role: 1 });
 
+// (15) Partial Filter Index — only indexes unassigned free agents (team == null)
+// Drastically saves RAM since active rostered players are omitted from this index.
+playerSchema.index(
+  { 'stats.kills': -1, createdAt: -1 },
+  { partialFilterExpression: { team: null } }
+);
+
+// (19) Collation — strength: 2 treats uppercase and lowercase as identical
+playerSchema.index(
+  { gamerTag: 1 },
+  { unique: true, sparse: true, collation: { locale: 'en', strength: 2 } }
+);
+
 module.exports = mongoose.model('Player', playerSchema);
+

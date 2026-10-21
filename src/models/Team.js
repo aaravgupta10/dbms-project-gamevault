@@ -26,12 +26,37 @@ const teamSchema = new mongoose.Schema(
       losses: { type: Number, default: 0, min: 0 },
       points: { type: Number, default: 0 },
     },
+    // (17) Soft Delete — preserves historical match integrity when a team disbands
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
 
+// (17) Mongoose Query Middleware Hooks — automatically intercept read queries to filter
+// out soft-deleted teams unless explicitly queried with includeDeleted: true
+teamSchema.pre(/^find/, function (next) {
+  if (this.getFilter().includeDeleted !== true) {
+    this.where({ isDeleted: { $ne: true } });
+  } else {
+    delete this.getFilter().includeDeleted;
+  }
+  next();
+});
+
+teamSchema.pre('countDocuments', function (next) {
+  if (this.getFilter().includeDeleted !== true) {
+    this.where({ isDeleted: { $ne: true } });
+  } else {
+    delete this.getFilter().includeDeleted;
+  }
+  next();
+});
+
 // (4) Indexing — leaderboards sort by points, lookups filter by game
 teamSchema.index({ game: 1 });
 teamSchema.index({ 'stats.points': -1 });
+teamSchema.index({ isDeleted: 1 });
 
 module.exports = mongoose.model('Team', teamSchema);
+

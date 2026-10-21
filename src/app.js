@@ -11,6 +11,9 @@ const tournamentRoutes = require('./routes/tournamentRoutes');
 const matchRoutes = require('./routes/matchRoutes');
 const inviteRoutes = require('./routes/inviteRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const auditRoutes = require('./routes/auditRoutes');
+const contractRoutes = require('./routes/contractRoutes');
+const mediaRoutes = require('./routes/mediaRoutes');
 
 const app = express();
 
@@ -21,7 +24,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 app.get('/', (req, res) => {
-  res.json({ message: 'GameVault API v2.0 is running' });
+  res.json({ message: 'GameVault API v3.0 (20 DBMS Features) is running' });
 });
 
 app.use('/api/players', playerRoutes);
@@ -30,8 +33,12 @@ app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/invites', inviteRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/audit', auditRoutes);
+app.use('/api/contracts', contractRoutes);
+app.use('/api/media', mediaRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
 
 module.exports = app;
+
